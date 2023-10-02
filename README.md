@@ -2,8 +2,10 @@
 cs2 ban system. sloppy code, might not be working properly.__
 contributions are welcome.__
 ## Installation
-1.Move config.json-sample to config.json and edit it. (CS2 server config)__
-2.Move .env-sample to .env and edit it. (discord bot)__
+1.Move config.json-sample to config.json and edit it. (CS2 server config)
+
+2.Move .env-sample to .env and edit it. (discord bot)
+
 3.Run `npm install`__
 4. put:__
 ```
