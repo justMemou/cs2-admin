@@ -90,7 +90,7 @@ function Server(address, port, rconPassword, globalPlayers) {
                     console.log("Kicking banned player - " + player.nickname + " - " + playerAdd.steamid);
                 }
             } else {
-                this.players[this.players.indexOf(this.players.find(p => p.steamid === player.steamid))] = player;
+                //this.players[this.players.indexOf(this.players.find(p => p.steamid === player.steamid))] = player;
             }
         }
     }
