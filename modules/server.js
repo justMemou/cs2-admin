@@ -73,7 +73,8 @@ function Server(address, port, rconPassword, globalPlayers) {
         });
         conn.connect();
     }
-    this.realrcon('logaddress_delall_http;log on;mp_logdetail 3;mp_logmoney 1;mp_logdetail_items 1;logaddress_add_http "http://beta.memo.gg:8080"');
+    //this is for testing purposes
+    //this.realrcon('logaddress_delall_http;log on;mp_logdetail 3;mp_logmoney 1;mp_logdetail_items 1;logaddress_add_http "http://beta.memo.gg:8080"');
     this.joinPlayer = function (player) {
         if (player.steamid != "BOT") {
             if (this.players.find(p => p.steamid === player.steamid) === undefined) {
