@@ -3,6 +3,10 @@ cs2 ban system. sloppy code, might not be working properly.
 
 Contributions are welcome.
 
+# Sample diagram
+
+![sample diagram](https://raw.githubusercontent.com/justMemou/cs2-admin/master/diagram.png)
+
 ## Installation
 1.Move config.json-sample to config.json and edit it. (CS2 server config)
 
@@ -11,7 +15,8 @@ Contributions are welcome.
 3.Run `npm install`
 
 
-4. put:__
+4. Put:
+
 ```
 log on;
 mp_logdetail 3;
