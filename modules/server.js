@@ -2,8 +2,12 @@
 
 var Rcon = require('simple-rcon');
 const fs = require('fs');
-//import .env file
+//require dotenv
 require('dotenv').config();
+//get host from dotenv
+const host = process.env.HOST;
+//get port from dotenv
+const port = process.env.PORT;
 
 function Server(address, port, rconPassword, globalPlayers) {
     this.address = address;
@@ -28,9 +32,9 @@ function Server(address, port, rconPassword, globalPlayers) {
             if (player.steamid != "BOT") {
                 //if player is in this.bannedids array
                 if (this.bannedids.includes(player.steamid)) {
-                    this.realrcon("kick " + player.nickname);
+                    this.realrcon('kickid "' + player.steamid + '"');
                     this.realrcon("say \x01The player \x07" + player.nickname + " \x01has been banned from the server.");
-                    console.log("Kicking banned player - " + player.nickname + " - " + player.steamid);
+                    console.log("Kicking banned player (from setinterval) - " + player.nickname + " - " + player.steamid);
                     //remove banned player from players and globalplayers 
                     this.players[this.players.indexOf(this.players.find(p => p.steamid === player.steamid))] = player;
                     this.globalPlayers[this.globalPlayers.indexOf(this.globalPlayers.find(p => p.steamid === player.steamid))] = player;
@@ -72,7 +76,7 @@ function Server(address, port, rconPassword, globalPlayers) {
         conn.connect();
     }
     //this is for testing purposes
-    this.realrcon('logaddress_delall_http;log on;mp_logdetail 3;mp_logmoney 1;mp_logdetail_items 1;logaddress_add_http "http://'+process.env.host+':8080"');
+    this.realrcon('logaddress_delall_http;log on;mp_logdetail 3;mp_logmoney 1;mp_logdetail_items 1;logaddress_add_http "'+host+':'+port+'"');
     this.joinPlayer = function (player) {
         if (player.steamid != "BOT") {
             if (this.players.find(p => p.steamid === player.steamid) === undefined) {
@@ -85,7 +89,7 @@ function Server(address, port, rconPassword, globalPlayers) {
                 this.players.push(playerAdd);
                 this.globalPlayers.push(playerAdd);
                 if (this.bannedids.includes(playerAdd.steamid)) {
-                    this.realrcon("kick " + player.nickname);
+                    this.realrcon('kickid "' + player.steamid + '"');
                     console.log("Kicking banned player - " + player.nickname + " - " + playerAdd.steamid);
                 }
             } else {
@@ -104,16 +108,25 @@ function Server(address, port, rconPassword, globalPlayers) {
     this.checkIfPlayerIsInList = function (player) {
         if (player.steamid != "BOT") {
             if (this.players.find(p => p.steamid === player.steamid) === undefined) {
-                this.players.push(player);
-                this.globalPlayers.push(player);
+                playerAdd = {
+                    steamid: player.steamid,
+                    nickname: player.nickname,
+                    joinDate: player.date + " " + player.time
+                }
+                this.players.push(playerAdd);
+                this.globalPlayers.push(playerAdd);
             } else {
-                return true;
+
             }
         }
     }
     this.resetPlayers = function () {
-        this.players = [];
+
     }
+    this.resetPlayersList = function () {
+
+    }
+
 }
 
 const servers = {};

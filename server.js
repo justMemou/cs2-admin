@@ -66,6 +66,7 @@ function handleEvent(event, serverAddr) {
             var match = regex.exec(event);
             if (match !== null) {
                 servers[serverAddr].resetPlayers();
+                
             }
             break;
         //pending connection
@@ -83,6 +84,14 @@ function handleEvent(event, serverAddr) {
             }
 
             break;
+        case event.includes("picked up"):
+            var regex = /(?<date>\d{2}\/\d{2}\/\d{4}) - (?<time>\d{2}:\d{2}:\d{2}): "(?<nickname>.*)<(?<serverId>\d+)><(?<steamid>.*)><(?<team>.*)>/gm;
+            var match = regex.exec(event);
+            if (match !== null) {
+                servers[serverAddr].checkIfPlayerIsInList(match.groups);
+            }
+            break;
+
         default:
         //console.log(serverAddr + " no match - " + event);
     }

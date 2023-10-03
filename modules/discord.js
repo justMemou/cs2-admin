@@ -38,102 +38,7 @@ client.once('ready', () => {
         if (message.author.bot) return;
         //if message in DISCORD_CHANNEL
         if (message.channel.id !== process.env.DISCORD_CHANNEL) return;
-        if (message.content.startsWith('$banip')) {
-            var args = message.content.split(' ');
-            var ip = args[1];
-            if (args[1] === undefined) {
-                message.reply('Empty IP');
-                return;
-            } else {
-                if (ip.match(/^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/)) {
-                    var reason = args[2];
-                    if (args[2] === undefined) {
-                        reason = "No reason provided";
-                    }
-                    //check if ip is already banned
-
-                    fs.readFile('./lists/listips.json', 'utf8', function readFileCallback(err, data) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            obj = JSON.parse(data);
-                            var index = obj.findIndex(x => x.ip === ip);
-                            if (index === -1) {
-                                obj.push({
-                                    ip: ip,
-                                    reason: reason,
-                                    bannedBy: message.author.username,
-                                    bannedOn: new Date().toLocaleString()
-                                });
-                                json = JSON.stringify(obj);
-                                fs.writeFile('./lists/listips.json', json, 'utf8', function (err) {
-                                    if (err) {
-                                        console.log(err);
-                                    }
-                                });
-                                message.reply('Banned IP: ' + ip + ' for reason: ' + reason);
-                            } else {
-                                message.reply('IP ' + ip + ' already banned');
-                                return;
-                            }
-                        }
-                    }
-                    );
-
-                } else {
-                    message.reply('Invalid IP');
-                    return;
-                }
-            }
-
-        } else if (message.content.startsWith('$unbanip')) {
-            //if unban is per IP
-            var args = message.content.split(' ');
-            var ip = args[1];
-            fs.readFile('./lists/listips.json', 'utf8', function readFileCallback(err, data) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    obj = JSON.parse(data);
-                    var index = obj.findIndex(x => x.ip === ip);
-                    if (index !== -1) {
-                        obj.splice(index, 1);
-                        json = JSON.stringify(obj);
-                        fs.writeFile('./lists/listips.json', json, 'utf8', function (err) {
-                            if (err) {
-                                console.log(err);
-                            }
-                        });
-                        message.reply('Unbanned IP: ' + ip);
-                    } else {
-                        message.reply('IP ' + ip + ' not found in list');
-                    }
-                }
-            });
-        } else if (message.content.startsWith('$findipban')) {
-            //if find is per IP
-            var args = message.content.split(' ');
-            var ip = args[1];
-            fs.readFile('./lists/listips.json', 'utf8', function readFileCallback(err, data) {
-                if (err) {
-                    console.log(err);
-                } else {
-                    //Find the index of the ip in the list if ip contains the ip
-                    obj = JSON.parse(data);
-                    var matches = obj.filter(x => x.ip.includes(ip));
-
-                    if (matches.length > 0) {
-                        var reply = 'IP ' + ip + ' found in list with reasons:\n';
-                        for (var i = 0; i < matches.length; i++) {
-                            reply += "IP: **" + matches[i].ip + "**. Reason: **" + matches[i].reason + '**. Banned by: **' + matches[i].bannedBy + '** Date: **' + matches[i].bannedOn + '**\n';
-                        }
-                        message.reply(reply);
-                    } else {
-                        message.reply('IP ' + ip + ' not found in list');
-                    }
-                }
-            });
-        } else if (message.content.startsWith('$ban')) {
+        if (message.content.startsWith('$ban')) {
             //if profile is requested
             var args = message.content.split(' ');
             var profile = args[1];
@@ -327,14 +232,21 @@ client.once('ready', () => {
         } else if (message.content.startsWith('$players')) {
             //get players from globalPlayers
             var players = globalPlayers;
-            var reply = 'Players: \n';
+            var reply = 'Players: - ' + players.length + '\n ```';
+            //foreach players
+
+            players.forEach(player => {
+                reply += player.nickname + ' - ' + player.steamid + '\n';
+            });
+
             for (var i = 0; i < players.length; i++) {
-                reply += players[i].nickname + ' -  <https://steamcommunity.com/profiles/' + players[i].steamid + '\n';
+                //reply += players[i].nickname + ' - '+players[i].steamid+'\n';
             }
+            reply += ' ```';
             message.reply(reply);
 
         } else if (message.content == "$help") {
-            message.reply('Commands:\n$```$ban <profile link> <reason>\n -Example: $ban https://steamcommunity.com/id/memopekc/ just-a-prank\n\n $unban <profile link>\n -Example: $unban https://steamcommunity.com/id/memopekc/\n\n $findban <profile link>\n -Example: $findban https://steamcommunity.com/id/memopekc/\n\n $banip <ip> <reason>\n -Example: $banip 123.123.123.123 just-a-prank\n\n $unbanip <ip>\n -Example: $unbanip 123.123.123.123 \n\n $findipban <ip>\n -Example: $findipban 123.123.123.123 \n\n $help \n -OBVIOUSLY THIS MENU```');
+            message.reply('Commands:\n$```$ban <profile link> <reason>\n -Example: $ban https://steamcommunity.com/id/memopekc/ just-a-prank\n\n $unban <profile link>\n -Example: $unban https://steamcommunity.com/id/memopekc/\n\n $findban <profile link>\n -Example: $findban https://steamcommunity.com/id/memopekc/\n\n $help \n -OBVIOUSLY THIS MENU```');
         }
 
     });
