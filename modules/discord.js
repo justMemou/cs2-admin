@@ -73,7 +73,7 @@ client.once('ready', () => {
                                     console.log(err);
                                 }
                             });
-                            message.reply('Banning: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID());
+                            message.reply('User: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID()+" have been banned.");
                         }
                     }
                 });
