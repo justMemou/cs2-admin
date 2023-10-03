@@ -27,8 +27,12 @@ app.post('/', (req, res) => {
     //check if req.headers['x-server-addr'] exists and if does continue
     //if not return 403
     if (req.headers['x-server-addr'] === undefined) {
-
+    
     } else {
+        //if req.headers['x-server-addr'] is not in serverList return 404
+        if (servers[req.headers['x-server-addr']] === undefined) {
+            res.sendStatus(404);
+        }
         req.body.split('\n').forEach(
             line => handleEvent(line, req.headers['x-server-addr'])
         );
