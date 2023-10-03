@@ -2,6 +2,8 @@
 
 var Rcon = require('simple-rcon');
 const fs = require('fs');
+//import .env file
+require('dotenv').config();
 
 function Server(address, port, rconPassword, globalPlayers) {
     this.address = address;
@@ -20,10 +22,6 @@ function Server(address, port, rconPassword, globalPlayers) {
     this.globalPlayers = globalPlayers;
 
     this.bannedids = [];
-    //show players every 2 seconds
-    setInterval(() => {
-        console.table(this.players);
-    }, 2000);
     //checking for banned players every 3 seconds
     setInterval(() => {
         this.players.forEach(player => {
@@ -74,7 +72,7 @@ function Server(address, port, rconPassword, globalPlayers) {
         conn.connect();
     }
     //this is for testing purposes
-    //this.realrcon('logaddress_delall_http;log on;mp_logdetail 3;mp_logmoney 1;mp_logdetail_items 1;logaddress_add_http "http://beta.memo.gg:8080"');
+    this.realrcon('logaddress_delall_http;log on;mp_logdetail 3;mp_logmoney 1;mp_logdetail_items 1;logaddress_add_http "http://'+process.env.host+':8080"');
     this.joinPlayer = function (player) {
         if (player.steamid != "BOT") {
             if (this.players.find(p => p.steamid === player.steamid) === undefined) {

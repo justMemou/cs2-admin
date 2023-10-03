@@ -87,3 +87,8 @@ function handleEvent(event, serverAddr) {
         //console.log(serverAddr + " no match - " + event);
     }
 }
+
+//all exceptions handler
+process.on('uncaughtException', function (err) {
+    console.log(err);
+});
