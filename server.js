@@ -81,15 +81,14 @@ function handleEvent(event, serverAddr) {
             }
             break;
         case event.includes("left buyzone"):
-            var regex = /(?<date>\d{2}\/\d{2}\/\d{4}) - (?<time>\d{2}:\d{2}:\d{2}): "(?<nickname>.*)<(?<serverId>\d+)><(?<steamid>.*)><(?<team>.*)>"/gm;
+            var regex = /(?<date>\d{2}\/\d{2}\/\d{4}) - (?<time>\d{2}:\d{2}:\d{2}).\d{3} - "(?<nickname>.*)<(?<serverId>\d+)><(?<steamid>.*)><(?<team>.*)>" left buyzone with \[(?<weapons>.*)\]/gm;
             var match = regex.exec(event);
             if (match !== null) {
                 servers[serverAddr].checkIfPlayerIsInList(match.groups);
             }
-
             break;
         case event.includes("picked up"):
-            var regex = /(?<date>\d{2}\/\d{2}\/\d{4}) - (?<time>\d{2}:\d{2}:\d{2}): "(?<nickname>.*)<(?<serverId>\d+)><(?<steamid>.*)><(?<team>.*)>/gm;
+            var regex = /(?<date>\d{2}\/\d{2}\/\d{4}) - (?<time>\d{2}:\d{2}:\d{2}).\d{3} - "(?<nickname>.*)<(?<serverId>\d+)><(?<steamid>.*)><(?<team>.*)>" picked up "(?<weapon_name>.*)"/gm;
             var match = regex.exec(event);
             if (match !== null) {
                 servers[serverAddr].checkIfPlayerIsInList(match.groups);
