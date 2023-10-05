@@ -29,3 +29,5 @@ in your server.cfg
 5. Run `node server.js`
 
 6. Invite the discord bot to your server ID and setup the channel ID in .env
+
+7. Change map on server so server.cfg config gets loaded.
