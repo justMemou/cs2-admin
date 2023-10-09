@@ -22,9 +22,13 @@ const SteamID = require('steamid');
 const steamIdResolver = require("steamid-resolver");
 
 let globalPlayers = [];
+let servers;
 
 function getGlobalPlayers(localGlobalPlayers) {
     globalPlayers = localGlobalPlayers;
+}
+function getServers(localServers) {
+    servers = localServers;
 }
 client.once('ready', () => {
     console.log('Ready!');
@@ -73,7 +77,7 @@ client.once('ready', () => {
                                     console.log(err);
                                 }
                             });
-                            message.reply('User: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID()+" have been banned.");
+                            message.reply('User: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID() + " have been banned.");
                         }
                     }
                 });
@@ -112,15 +116,39 @@ client.once('ready', () => {
                 ).catch((error) => {
                     message.reply('Profile not found OR steam returned some error.');
                 });
+            } else if (new SteamID(profile).isValid()) {
+                let steamid3 = new SteamID(profile);
+                //check if steamid3 is already banned
+                fs.readFile('./lists/listids.json', 'utf8', function readFileCallback(err, data) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        obj = JSON.parse(data);
+                        var index = obj.findIndex(x => x.steamid === steamid3.getSteam3RenderedID());
+                        if (index !== -1) {
+                            message.reply('SteamID3: ' + steamid3.getSteam3RenderedID() + ' is already banned.');
+                        } else {
+                            //ban the player steamid3
+                            obj.push({
+                                steamid: steamid3.getSteam3RenderedID(),
+                                reason: reason,
+                                bannedBy: message.author.username,
+                                bannedOn: new Date().toLocaleString()
+                            });
+                            json = JSON.stringify(obj);
+                            fs.writeFile('./lists/listids.json', json, 'utf8', function (err) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                            message.reply('Banning:' + steamid3.getSteam3RenderedID());
+                        }
+                    }
+                });
             } else {
                 message.reply('Invalid profile link');
                 return;
             }
-
-
-
-
-
         } else if (message.content.startsWith('$unban')) {
             //if profile is requested
             var args = message.content.split(' ');
@@ -180,6 +208,33 @@ client.once('ready', () => {
                 ).catch((error) => {
                     message.reply('Profile not found OR steam returned some error.');
                 });
+            } else if (new SteamID(profile).isValid()) {
+                let steamid3 = new SteamID(profile);
+                //check if steamid3 is already banned
+                fs.readFile('./lists/listids.json', 'utf8', function readFileCallback(err, data) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        obj = JSON.parse(data);
+                        var index = obj.findIndex(x => x.steamid === steamid3.getSteam3RenderedID());
+                        if (index !== -1) {
+                            obj.splice(index, 1);
+                            json = JSON.stringify(obj);
+                            fs.writeFile('./lists/listids.json', json, 'utf8', function (err) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                            message.reply('Unbaning: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID());
+                        } else {
+                            message.reply('SteamID3: ' + steamid3.getSteam3RenderedID() + ' is not banned');
+                        }
+                    }
+                });
+            }
+            else {
+                message.reply('Invalid profile link');
+                return;
             }
 
         } else if (message.content.startsWith('$findban')) {
@@ -245,10 +300,50 @@ client.once('ready', () => {
             reply += ' ```';
             message.reply(reply);
 
-        } else if (message.content == "$help") {
-            message.reply('Commands:\n$```$ban <profile link> <reason>\n -Example: $ban https://steamcommunity.com/id/memopekc/ just-a-prank\n\n $unban <profile link>\n -Example: $unban https://steamcommunity.com/id/memopekc/\n\n $findban <profile link>\n -Example: $findban https://steamcommunity.com/id/memopekc/\n\n $help \n -OBVIOUSLY THIS MENU```');
+        } else if (message.content.startsWith('$servers')) {
+            Object.keys(servers).forEach(server => {
+                let players = "";
+                servers[server].players.forEach(player => {
+                    players += player.nickname + ' - ' + new SteamID(player.steamid).getSteamID64() + '\n';
+                });
+                message.reply('Server: ' + servers[server].name + ' - ' + servers[server].players.length + ' players\n``` ' + players + ' ```');
+                //console.table(servers[server].players)
+            });
+        } else if (message.content.startsWith('$kick')) {
+            //if profile is requested
+            var args = message.content.split(' ');
+            var profile = args[1];
+            if (profile.startsWith('https://steamcommunity.com/profiles/')) {
+                //get everything after /profiles and ensure, use regex to get only numbers
+                let steamid = profile.match(/(?<=\/profiles\/)\d+/)[0];
+                //convert steamid64 to steamid3
+                let steamid3 = new SteamID(steamid);
+                ////////// TUK KICKVAME
+                Object.keys(servers).forEach(server => {
+                    servers[server].realrcon(`kickid "${steamid3.getSteam3RenderedID()}"`);
+                });
+            } else if (profile.startsWith('https://steamcommunity.com/id/')) {
+                let steamid = steamIdResolver.customUrlToSteamID64(profile).then((steamid) => {
+                    //convert steamid64 to steamid3
+                    let steamid3 = new SteamID(steamid);
+                    Object.keys(servers).forEach(server => {
+                        servers[server].realrcon(`kickid "${steamid3.getSteam3RenderedID()}"`);
+                    });
+                }
+                ).catch((error) => {
+                    message.reply('Profile not found OR steam returned some error.');
+                });
+            } else if (new SteamID(profile).isValid()) {
+                let steamid3 = new SteamID(profile);
+                Object.keys(servers).forEach(server => {
+                    servers[server].realrcon(`kickid "${steamid3.getSteam3RenderedID()}"`);
+                });
+            } else {
+                message.reply('Invalid profile link');
+                return;
+            }
+            message.react("👍");
         }
-
     });
 });
 
@@ -265,3 +360,4 @@ client.once('ready', () => {
 client.login(process.env.DISCORD_TOKEN);
 exports.client = client;
 exports.getGlobalPlayers = getGlobalPlayers;
+exports.getServers = getServers;

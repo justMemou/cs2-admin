@@ -12,8 +12,10 @@ discord.getGlobalPlayers(globalPlayers);
 
 
 serverList.forEach(server => {
-    servers[server.ip + ':' + server.port] = new Server(server.ip, server.port, server.rcon_pass, globalPlayers);
+    servers[server.ip + ':' + server.port] = new Server(server.ip, server.port, server.rcon_pass, server.name, globalPlayers);
 });
+discord.getServers(servers);
+
 
 
 const express = require('express');
@@ -94,7 +96,13 @@ function handleEvent(event, serverAddr) {
                 servers[serverAddr].checkIfPlayerIsInList(match.groups);
             }
             break;
-
+        //case event.includes("dropped"):
+            //var regex = /(?<date>\d{2}\/\d{2}\/\d{4}) - (?<time>\d{2}:\d{2}:\d{2}): "(?<nickname>.*)<(?<serverId>\d+)><(?<steamid>.*)><(?<team>.*)>" \[\d+ \d+ \d+\] with "(?<weapon>.*)" \(damage "(?<damage_given>\d+)"\) \(damage_armor "(?<damage_armor>\d+)"\) \(health "(?<health>\d+)"\) \(armor "(?<armor>\d+)"\) \(hitgroup "(?<hitgroup>.*)"\)/gm;
+            //var match = regex.exec(event);
+            //if (match !== null) {
+                //servers[serverAddr].checkIfPlayerIsInList(match.groups);
+            //}
+            //break;
         default:
         //console.log(serverAddr + " no match - " + event);
     }

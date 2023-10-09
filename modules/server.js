@@ -9,7 +9,8 @@ const host = process.env.HOST;
 //get port from dotenv
 const nodePort = process.env.PORT;
 
-function Server(address, port, rconPassword, globalPlayers) {
+function Server(address, port, rconPassword, name, globalPlayers) {
+    this.name = name;
     this.address = address;
     this.port = port;
     this.rconPassword = rconPassword;

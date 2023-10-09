@@ -1,5 +1,6 @@
 [
     {
+        "name":"",
         "ip": "",
         "port": 0,
         "rcon_pass": ""
