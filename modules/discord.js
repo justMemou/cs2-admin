@@ -30,6 +30,22 @@ function getGlobalPlayers(localGlobalPlayers) {
 function getServers(localServers) {
     servers = localServers;
 }
+function addTimeToUnix(time) {
+    var unix = Math.floor(new Date().getTime() / 1000);
+    if (time.slice(-1) == "h") {
+        //add unix plus time.slice-1 (hours)
+        unix = unix + time.slice(0, -1) * 60 * 60;
+    } else if (time.slice(-1) == "d") {
+        //add unix plus time.slice-1 (days)
+        unix = unix + time.slice(0, -1) * 60 * 60 * 24;
+    } else if (time.slice(-1) == "m") {
+        //add unix plus time.slice-1 (months)
+        unix = unix + time.slice(0, -1) * 60 * 60 * 24 * 30;
+    } else if (time == "permanent" || time == "perm" || time == "perma") {
+        unix = "permanent";
+    }
+    return unix;
+}
 client.once('ready', () => {
     console.log('Ready!');
 
@@ -46,7 +62,10 @@ client.once('ready', () => {
             //if profile is requested
             var args = message.content.split(' ');
             var profile = args[1];
-            var reason = args[2];
+            //reason = every argument after profile
+            var reason = args.slice(2).join(' ');
+
+            //var reason = args[2];
             if (args[2] === undefined) {
                 reason = "No reason provided";
             }
@@ -343,6 +362,14 @@ client.once('ready', () => {
                 return;
             }
             message.react("👍");
+        } else if (message.content.startsWith('$testTimer')) {
+            //if profile is requested
+            var args = message.content.split(' ');
+            var time = args[1];
+            var unix = addTimeToUnix(time);
+            var currentUnixTime = Math.floor(new Date().getTime() / 1000);
+            message.reply(`Current unix time <t:${currentUnixTime}:R>. The timer after penalty <t:${unix}:R>`);
+
         }
     });
 });
