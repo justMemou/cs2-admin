@@ -29,16 +29,20 @@ app.post('/', (req, res) => {
     //check if req.headers['x-server-addr'] exists and if does continue
     //if not return 403
     if (req.headers['x-server-addr'] === undefined) {
-    
+
     } else {
         //if req.headers['x-server-addr'] is not in serverList return 404
         if (servers[req.headers['x-server-addr']] === undefined) {
             res.sendStatus(404);
+            //skip the rest of the code
+            return;
+        } else {
+            res.sendStatus(200);
         }
         req.body.split('\n').forEach(
             line => handleEvent(line, req.headers['x-server-addr'])
         );
-        res.sendStatus(200);
+        
     }
 
 
@@ -56,6 +60,7 @@ function handleEvent(event, serverAddr) {
             var match = regex.exec(event);
             if (match !== null) {
                 servers[serverAddr].joinPlayer(match.groups);
+
             }
             break;
         //on disconnect remove player from list
@@ -72,7 +77,7 @@ function handleEvent(event, serverAddr) {
             var match = regex.exec(event);
             if (match !== null) {
                 servers[serverAddr].resetPlayers();
-                
+
             }
             break;
         //pending connection
@@ -80,6 +85,7 @@ function handleEvent(event, serverAddr) {
             var regex = /(?<date>\d{2}\/\d{2}\/\d{4}) - (?<time>\d{2}:\d{2}:\d{2}.\d{3}) - "(?<nickname>.*)<(?<serverId>\d+)><(?<steamid>.*)><(?<team>.*)>" connected, address "(?<ipClient>.*):\d+"/gm;
             var match = regex.exec(event);
             if (match !== null) {
+                servers[serverAddr].checkPlayer(match.groups);
             }
             break;
         case event.includes("left buyzone"):
@@ -97,12 +103,12 @@ function handleEvent(event, serverAddr) {
             }
             break;
         //case event.includes("dropped"):
-            //var regex = /(?<date>\d{2}\/\d{2}\/\d{4}) - (?<time>\d{2}:\d{2}:\d{2}): "(?<nickname>.*)<(?<serverId>\d+)><(?<steamid>.*)><(?<team>.*)>" \[\d+ \d+ \d+\] with "(?<weapon>.*)" \(damage "(?<damage_given>\d+)"\) \(damage_armor "(?<damage_armor>\d+)"\) \(health "(?<health>\d+)"\) \(armor "(?<armor>\d+)"\) \(hitgroup "(?<hitgroup>.*)"\)/gm;
-            //var match = regex.exec(event);
-            //if (match !== null) {
-                //servers[serverAddr].checkIfPlayerIsInList(match.groups);
-            //}
-            //break;
+        //var regex = /(?<date>\d{2}\/\d{2}\/\d{4}) - (?<time>\d{2}:\d{2}:\d{2}): "(?<nickname>.*)<(?<serverId>\d+)><(?<steamid>.*)><(?<team>.*)>" \[\d+ \d+ \d+\] with "(?<weapon>.*)" \(damage "(?<damage_given>\d+)"\) \(damage_armor "(?<damage_armor>\d+)"\) \(health "(?<health>\d+)"\) \(armor "(?<armor>\d+)"\) \(hitgroup "(?<hitgroup>.*)"\)/gm;
+        //var match = regex.exec(event);
+        //if (match !== null) {
+        //servers[serverAddr].checkIfPlayerIsInList(match.groups);
+        //}
+        //break;
         default:
         //console.log(serverAddr + " no match - " + event);
     }
