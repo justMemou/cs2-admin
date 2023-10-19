@@ -31,7 +31,7 @@ function getServers(localServers) {
     servers = localServers;
 }
 function addTimeToUnix(time) {
-    var unix = Math.floor(new Date().getTime() / 1000);
+    var unix = Math.round(new Date().getTime() / 1000);
     if (time.slice(-1) == "h") {
         //add unix plus time.slice-1 (hours)
         unix = unix + time.slice(0, -1) * 60 * 60;
@@ -370,7 +370,182 @@ client.once('ready', () => {
             var currentUnixTime = Math.floor(new Date().getTime() / 1000);
             message.reply(`Current unix time <t:${currentUnixTime}:R>. The timer after penalty <t:${unix}:R>`);
 
+        } else if (message.content.startsWith('$addVip')) {
+            //add vip to vips.json if its not found
+            console.log("add vip called");
+            var args = message.content.split(' ');
+            var time = args[1];
+            var expireTime = addTimeToUnix(time);
+            var profile = args[2];
+            var nickname = args[3];
+            //if args 1, 2 or 3 is undefined, reply and return
+            if (args[1] === undefined || args[2] === undefined || args[3] === undefined) {
+                message.reply('Invalid arguments. Use: $addVip <time> <profile> <nickname>');
+                return;
+            }
+            if (profile.startsWith('https://steamcommunity.com/profiles/')) {
+                //get everything after /profiles and ensure, use regex to get only numbers
+                let steamid = profile.match(/(?<=\/profiles\/)\d+/)[0];
+                //convert steamid64 to steamid3
+                let steamid3 = new SteamID(steamid);
+                //check if steamid3 is already banned
+                fs.readFile('./lists/vips.json', 'utf8', function readFileCallback(err, data) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        obj = JSON.parse(data);
+                        var index = obj.findIndex(x => x.steamid === steamid3.getSteam3RenderedID());
+                        if (index !== -1) {
+                            message.reply('User: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID() + ' is already VIP.');
+                        } else {
+                            //ban the player steamid3
+                            obj.push({
+                                steamid: steamid3.getSteam3RenderedID(),
+                                addedBy: message.author.username,
+                                addedOn: Math.floor(new Date().getTime() / 1000),
+                                expiresOn: expireTime,
+                                nickname: nickname
+                            });
+                            json = JSON.stringify(obj);
+                            fs.writeFile('./lists/vips.json', json, 'utf8', function (err) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                            message.reply('Adding VIP: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID());
+                        }
+                    }
+                });
+            } else if (profile.startsWith('https://steamcommunity.com/id/')) {
+                let steamid = steamIdResolver.customUrlToSteamID64(profile).then((steamid) => {
+                    //convert steamid64 to steamid3
+                    let steamid3 = new SteamID(steamid);
+                    //check if steamid3 is already banned
+                    fs.readFile('./lists/vips.json', 'utf8', function readFileCallback(err, data) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            obj = JSON.parse(data);
+                            var index = obj.findIndex(x => x.steamid === steamid3.getSteam3RenderedID());
+                            if (index !== -1) {
+                                message.reply('User: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID() + ' is already VIP.');
+
+                            } else {
+                                //ban the player steamid3
+                                obj.push({
+                                    steamid: steamid3.getSteam3RenderedID(),
+                                    addedBy: message.author.username,
+                                    addedOn: Math.floor(new Date().getTime() / 1000),
+                                    expiresOn: expireTime,
+                                    nickname: nickname
+                                });
+                                json = JSON.stringify(obj);
+                                fs.writeFile('./lists/vips.json', json, 'utf8', function (err) {
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                });
+                                message.reply('Adding VIP: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID());
+                            }
+                        }
+                    });
+                });
+            }
+        } else if (message.content.startsWith('$removeVip')) {
+            //find if the steamid is in vips.json and if it is, remove it
+            var args = message.content.split(' ');
+            var profile = args[1];
+            if (profile.startsWith('https://steamcommunity.com/profiles/')) {
+                //get everything after /profiles and ensure, use regex to get only numbers
+                let steamid = profile.match(/(?<=\/profiles\/)\d+/)[0];
+                //convert steamid64 to steamid3
+                let steamid3 = new SteamID(steamid);
+                //check if steamid3 is already banned
+                fs.readFile('./lists/vips.json', 'utf8', function readFileCallback(err, data) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        obj = JSON.parse(data);
+                        var index = obj.findIndex(x => x.steamid === steamid3.getSteam3RenderedID());
+                        if (index !== -1) {
+                            obj.splice(index, 1);
+                            json = JSON.stringify(obj);
+                            fs.writeFile('./lists/vips.json', json, 'utf8', function (err) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                            message.reply('Removing VIP: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID());
+                        } else {
+                            message.reply('User: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID() + ' is not VIP.');
+                        }
+                    }
+                });
+            } else if (profile.startsWith('https://steamcommunity.com/id/')) {
+                let steamid = steamIdResolver.customUrlToSteamID64(profile).then((steamid) => {
+                    //convert steamid64 to steamid3
+                    let steamid3 = new SteamID(steamid);
+                    //check if steamid3 is already banned
+                    fs.readFile('./lists/vips.json', 'utf8', function readFileCallback(err, data) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            obj = JSON.parse(data);
+                            var index = obj.findIndex(x => x.steamid === steamid3.getSteam3RenderedID());
+                            if (index !== -1) {
+                                obj.splice(index, 1);
+                                json = JSON.stringify(obj);
+                                fs.writeFile('./lists/vips.json', json, 'utf8', function (err) {
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                });
+                                message.reply('Removing VIP: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID());
+                            }
+                        }
+                    });
+                });
+            } else if (profile.startsWith('[U:1') || profile.startsWith('[U:0')) {
+                let steamid3 = new SteamID(profile);
+                //check if steamid3 is already banned
+                fs.readFile('./lists/vips.json', 'utf8', function readFileCallback(err, data) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        obj = JSON.parse(data);
+                        var index = obj.findIndex(x => x.steamid === steamid3.getSteam3RenderedID());
+                        if (index !== -1) {
+                            obj.splice(index, 1);
+                            json = JSON.stringify(obj);
+                            fs.writeFile('./lists/vips.json', json, 'utf8', function (err) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                            });
+                            message.reply('Removing VIP: https://steamcommunity.com/profiles/' + steamid3.getSteam3RenderedID());
+                        }
+                    }
+                });
+            }
+        } else if (message.content.startsWith('$vipList')) {
+            //get players from globalPlayers
+            var vips = [];
+            fs.readFile('./lists/vips.json', 'utf8', function readFileCallback(err, data) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    vips = JSON.parse(data);
+                    var reply = 'VIP List: ' + vips.length + '\n';
+                    //foreach players
+                    vips.forEach(vip => {
+                        reply += "**" + vip.nickname + `** \`\`${vip.steamid}\`\` added on: <t:${vip.addedOn}:R>, expires: <t:${vip.expiresOn}:R> by: **${vip.addedBy}**\n`;
+                    });
+                    message.reply(reply);
+                }
+            });
+
         }
+
     });
 });
 

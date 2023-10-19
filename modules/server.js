@@ -25,6 +25,7 @@ function Server(address, port, rconPassword, name, globalPlayers) {
     this.players = [];
     this.globalPlayers = globalPlayers;
     this.bannedids = [];
+    this.vips = [];
     //checking for banned players every 3 seconds
     setInterval(() => {
         this.players.forEach(player => {
@@ -56,6 +57,22 @@ function Server(address, port, rconPassword, name, globalPlayers) {
             });
         });
     }, 2000);
+
+    setInterval(() => {
+        // read vips list
+        fs.readFile('./lists/vips.json', 'utf8', (err, data) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            this.vips = [];
+            idVipsList = JSON.parse(data);
+            idVipsList.forEach(vip => {
+                this.vips.push(vip.steamid);
+            });
+        });
+    }, 2000);
+
     this.realrcon = function (cmd) {
         if (cmd === undefined) return;
         var conn = new Rcon({
@@ -105,7 +122,7 @@ function Server(address, port, rconPassword, name, globalPlayers) {
         }
     }
     this.checkIfPlayerIsInList = function (player) {
-        
+
         if (player.steamid != "BOT") {
             if (this.players.find(p => p.steamid === player.steamid) === undefined) {
                 playerAdd = {
@@ -127,6 +144,18 @@ function Server(address, port, rconPassword, name, globalPlayers) {
 
     }
 
+    this.checkPlayer = function (player) {
+        if (this.players.length >= 29) {
+            this.vips.forEach(vip => {
+                if (player.steamid === vip) {
+                   console.log("VIP joined a full server ("+this.players.length+") - " + player.nickname + " - " + player.steamid);
+                } else {
+                    console.log("Kicking non-vip for reserved slot - currently ("+this.players.length+")" + player.nickname + " - " + player.steamid);
+                    this.realrcon('kickid "' + player.steamid);
+                }
+            });
+        }
+    }
 }
 
 const servers = {};
