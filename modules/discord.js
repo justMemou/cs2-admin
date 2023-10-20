@@ -1,6 +1,28 @@
 //import .env file
 require('dotenv').config();
-
+const { table } = require('table');
+const tableConfig = {
+    border: {
+      topBody: `─`,
+      topJoin: `┬`,
+      topLeft: `┌`,
+      topRight: `┐`,
+  
+      bottomBody: `─`,
+      bottomJoin: `┴`,
+      bottomLeft: `└`,
+      bottomRight: `┘`,
+  
+      bodyLeft: `│`,
+      bodyRight: `│`,
+      bodyJoin: `│`,
+  
+      joinBody: `─`,
+      joinLeft: `├`,
+      joinRight: `┤`,
+      joinJoin: `┼`
+    }
+  };
 const Discord = require('discord.js'); //import discord.js
 const {
     inherits
@@ -365,7 +387,7 @@ client.once('ready', () => {
 
 
         } else if (message.content.startsWith('$vipList') || message.content.startsWith('$vips') || message.content.startsWith('$listVip')) {
-            //get players from globalPlayers
+            //get vip list, and reply them as file
             var vips = [];
             fs.readFile('./lists/vips.json', 'utf8', function readFileCallback(err, data) {
                 if (err) {
@@ -373,11 +395,25 @@ client.once('ready', () => {
                 } else {
                     vips = JSON.parse(data);
                     var reply = 'VIP List: ' + vips.length + '\n';
+                    var vipTable = [["#", "Nickname", "SteamID", "Added on", "Expires on", "Added by"]];
                     //foreach players
                     vips.forEach(vip => {
-                        reply += "**" + vip.nickname + `** \`\`${vip.steamid}\`\` added on: <t:${vip.addedOn}:R>, expires: <t:${vip.expiresOn}:R> by: **${vip.addedBy}**\n`;
+                        //convert unix to human readable (YYYY-MM-DD HH:MM:SS) in Bulgarian timezone (GMT+3) and add to reply
+                        let addedOnToHuman = new Date(vip.addedOn * 1000).toLocaleString("bg-BG", { timeZone: "Europe/Sofia" });
+                        let expiresOnToHuman = new Date(vip.expiresOn * 1000).toLocaleString("bg-BG", { timeZone: "Europe/Sofia" });
+                        let steamid64 = new SteamID(vip.steamid).getSteamID64();
+                        reply += "" + vip.nickname + ` https://steamcommunity.com/profiles/${steamid64}/ added on: ${addedOnToHuman}, expires: ${expiresOnToHuman} by: ${vip.addedBy}\n`;
+                        vipTable.push([vipTable.length, vip.nickname, steamid64, addedOnToHuman, expiresOnToHuman, vip.addedBy]);
                     });
-                    message.reply(reply);
+                    let vipTableString = table(vipTable, tableConfig);
+                    //save the vips as file and send the file
+                    fs.writeFile('./lists/vips.txt', vipTableString, 'utf8', function (err) {
+                        if (err) {
+                            console.log(err);
+                        }
+                    });
+                    message.reply({ files: ['./lists/vips.txt'] });
+                    
                 }
             });
 
@@ -422,7 +458,7 @@ client.once('ready', () => {
                     //remove vip
                     removeVip(vip.steamid);
                     //send message to discord
-                    client.channels.cache.get(process.env.DISCORD_CHANNEL).send('VIP: ' + vip.nickname + ' - <https://steamcommunity.com/profiles' + steamid64 + '/> has expired. Auto removed VIP.');
+                    client.channels.cache.get(process.env.DISCORD_CHANNEL).send('VIP: ' + vip.nickname + ' - <https://steamcommunity.com/profiles/' + steamid64 + '/> has expired. Auto removed VIP.');
                     console.log("VIP: " + vip.nickname + ' - ' + vip.steamid + ' has expired. Auto removed VIP.');
                 }
             });
