@@ -1,5 +1,8 @@
 # cs2-admin
-A discord bot that allows you to control your cs2 server from discord.
+cs2-admin panel controlled via discord. 
+
+Contributions are more than welcome.
+
 
 ## Features
 - [x] BAN Player
@@ -7,9 +10,6 @@ A discord bot that allows you to control your cs2 server from discord.
 - [x] KICK Player
 
 Full list of commands is available in the discord bot help command or screenshot below.
-
-
-Contributions are welcome.
 
 # Sample diagram
 
