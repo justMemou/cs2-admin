@@ -18,7 +18,7 @@ Contributions are welcome.
 
 5. Run `node server.js`
 
-6. Once you ensure that your nodejs server (waiting for events from the cs2 server (you can open http://<YOUR-NODE-SERVER>:8080 and you SHOULD RECEIVE "Cannot GET /" ⬅️ THIS IS EXPECTED)) is running you can:
+6. Once you ensure that your nodejs server (waiting for events from the cs2 server (you can open `http://<YOUR-NODE-SERVER>:8080` and you SHOULD RECEIVE "Cannot GET /" ⬅️ THIS IS EXPECTED)) is running you can:
 
 5. Put the following in your server.cfg
 
