@@ -36,7 +36,8 @@ in your server.cfg
 7. Change map on server so server.cfg config gets loaded.
 
 ## Available discord commands:
-![discord commands](https://raw.githubusercontent.com/justMemou/cs2-admin/master/diagram.png)
+![discord commands](https://raw.githubusercontent.com/justMemou/cs2-admin/master/help.png)
+Currently all of the listed functions **should** be fully functional.
 
-The VIP system is experimental. It is only reserving slots. When a server hits 29 players - it starts refusing NON-VIP users.
+The VIP system is **experimental**. It is only reserving slots. When a server hits 29 players - it starts refusing NON-VIP users.
 Will try to improve it in few days/weeks.
