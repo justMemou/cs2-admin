@@ -91,8 +91,7 @@ function Server(address, port, rconPassword, name, globalPlayers) {
         });
         conn.connect();
     }
-    //this is for testing purposes
-    //this.realrcon('logaddress_delall_http;log on;mp_logdetail 3;mp_logmoney 1;mp_logdetail_items 1;logaddress_add_http "'+host+':'+nodePort+'"');
+
     this.joinPlayer = function (player) {
         if (player.steamid != "BOT") {
             if (this.players.find(p => p.steamid === player.steamid) === undefined) {
