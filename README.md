@@ -28,7 +28,7 @@ Full list of commands is available in the discord bot help command or screenshot
 
 6. Once you ensure that your nodejs server (waiting for events from the cs2 server (you can open `http://<YOUR-NODE-SERVER>:8080` and you SHOULD RECEIVE "Cannot GET /" ⬅️ THIS IS EXPECTED)) is running you can:
 
-5. Put the following in your server.cfg
+7. Put the following in your server.cfg
 
 ```
 log on;
@@ -40,7 +40,7 @@ logaddress_add_http "http://<YOUR-NODE-SERVER>:8080";
 
 
 
-7. Change map on server so server.cfg config gets loaded.
+8. Change map on server so server.cfg config gets loaded.
 
 ## Available discord commands:
 ![discord commands](https://raw.githubusercontent.com/justMemou/cs2-admin/master/help.png)
