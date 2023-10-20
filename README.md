@@ -1,5 +1,13 @@
 # cs2-admin
-cs2 ban system. sloppy code, might not be working properly.
+A discord bot that allows you to control your cs2 server from discord.
+
+## Features
+- [x] BAN Player
+- [x] UNBAN Player
+- [x] KICK Player
+
+Full list of commands is available in the discord bot help command or screenshot below.
+
 
 Contributions are welcome.
 
