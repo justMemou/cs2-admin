@@ -8,14 +8,19 @@ Contributions are welcome.
 ![sample diagram](https://raw.githubusercontent.com/justMemou/cs2-admin/master/diagram.png)
 
 ## Installation
-1.Move config.json-sample to config.json and edit it. (CS2 server config)
+1. Move config.json-sample to config.json and edit it. (CS2 server config)(!!!supports multiple servers!!!)
 
-2.Move .env-sample to .env and edit it. (discord bot)
+2. Move .env-sample to .env and edit it. (discord bot)
 
-3.Run `npm install`
+3. Invite the discord bot to your server ID and setup the channel ID in .env
 
+4. Run `npm install`
 
-4. Put:
+5. Run `node server.js`
+
+6. Once you ensure that your nodejs server (waiting for events from the cs2 server) is running you can:
+
+5. Put:
 
 ```
 log on;
@@ -26,8 +31,12 @@ logaddress_add_http "http://<YOUR-NODE-SERVER>:8080";
 ```
 in your server.cfg
 
-5. Run `node server.js`
 
-6. Invite the discord bot to your server ID and setup the channel ID in .env
 
 7. Change map on server so server.cfg config gets loaded.
+
+## Available discord commands:
+![discord commands](https://raw.githubusercontent.com/justMemou/cs2-admin/master/diagram.png)
+
+The VIP system is experimental. It is only reserving slots. When a server hits 29 players - it starts refusing NON-VIP users.
+Will try to improve it in few days/weeks.
