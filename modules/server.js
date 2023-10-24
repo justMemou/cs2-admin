@@ -71,6 +71,7 @@ function Server(address, port, rconPassword, name, globalPlayers) {
                 this.vips.push(vip.steamid);
             });
         });
+        //console.table(this.vips)
     }, 2000);
 
     this.realrcon = function (cmd) {
@@ -145,14 +146,12 @@ function Server(address, port, rconPassword, name, globalPlayers) {
 
     this.checkPlayer = function (player) {
         if (this.players.length >= 29) {
-            this.vips.forEach(vip => {
-                if (player.steamid === vip) {
-                   console.log("VIP joined a full server ("+this.players.length+") - " + player.nickname + " - " + player.steamid);
-                } else {
-                    console.log("Kicking non-vip for reserved slot - currently ("+this.players.length+")" + player.nickname + " - " + player.steamid);
-                    this.realrcon('kickid "' + player.steamid);
-                }
-            });
+            if(this.vips.includes(player.steamid)) {
+                console.log("VIP joined a full server ("+this.players.length+") - " + player.nickname + " - " + player.steamid);
+            } else {
+                console.log("Kicking non-vip for reserved slot - currently ("+this.players.length+")" + player.nickname + " - " + player.steamid);
+                this.realrcon('kickid "' + player.steamid+ '""reserved slot."');
+            }
         }
     }
 }
